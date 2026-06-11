@@ -2,8 +2,7 @@ window.generate = async function () {
   const name = document.getElementById("name").value;
   const job = document.getElementById("job").value;
 
-  const resultBox = document.getElementById("result");
-  resultBox.innerHTML = "Generating... 🔥";
+  document.getElementById("result").innerHTML = "Generating... 🔥";
 
   try {
     const res = await fetch("/api/generate", {
@@ -11,22 +10,16 @@ window.generate = async function () {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        name,
-        job
-      })
+      body: JSON.stringify({ name, job })
     });
 
     const data = await res.json();
 
-    if (!res.ok) {
-      resultBox.innerHTML = "Error: " + (data.error || "Request failed");
-      return;
-    }
-
-    resultBox.innerHTML = data.result;
+    document.getElementById("result").innerHTML =
+      data.result || data.error || "No response";
 
   } catch (error) {
-    resultBox.innerHTML = "Network Error: " + error.message;
+    document.getElementById("result").innerHTML =
+      "Error: " + error.message;
   }
 };
