@@ -1,4 +1,4 @@
-async function generate() {
+window.generate = async function () {
   console.log("Button clicked");
 
   const name = document.getElementById("name").value;
@@ -15,18 +15,13 @@ async function generate() {
       body: JSON.stringify({ name, job })
     });
 
-    console.log("Response status:", res.status);
-
     const data = await res.json();
 
-    console.log("DATA:", data);
-
     document.getElementById("result").innerHTML =
-      data.result || data.error || "No response";
+      data.result || data.error;
 
   } catch (error) {
-    console.log("ERROR:", error);
     document.getElementById("result").innerHTML =
       "Error: " + error.message;
   }
-}
+};
