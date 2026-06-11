@@ -5,28 +5,19 @@ const client = new OpenAI({
 });
 
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST allowed" });
+  }
+
   try {
-    const { name, job, company, education, experience, skills } = req.body;
-
-    const prompt = `
-Write a professional cover letter.
-
-Name: ${name}
-Job Title: ${job}
-Company: ${company}
-Education: ${education}
-Experience: ${experience}
-Skills: ${skills}
-
-Create a professional ATS-friendly cover letter.
-`;
+    const { name, job } = req.body;
 
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "user",
-          content: prompt
+          content: `Write a cover letter for ${name} applying for ${job}`
         }
       ]
     });
@@ -36,8 +27,7 @@ Create a professional ATS-friendly cover letter.
     });
 
   } catch (error) {
-    res.status(500).json({
-      error: error.message
-    });
+    console.log(error);
+    res.status(500).json({ error: error.message });
   }
 }
