@@ -1,9 +1,4 @@
 window.generate = async function () {
-  console.log("Button clicked");
-
-  const name = document.getElementById("name").value;
-  const job = document.getElementById("job").value;
-
   document.getElementById("result").innerHTML = "Loading... 🔥";
 
   try {
@@ -12,10 +7,21 @@ window.generate = async function () {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ name, job })
+      body: JSON.stringify({
+        name: document.getElementById("name").value,
+        job: document.getElementById("job").value
+      })
     });
 
-    const data = await res.json();
+    const text = await res.text(); // IMPORTANT FIX
+
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error("Server returned invalid response: " + text);
+    }
 
     document.getElementById("result").innerHTML =
       data.result || data.error;
