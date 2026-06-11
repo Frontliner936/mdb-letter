@@ -13,34 +13,33 @@ export default async function handler(req, res) {
     const prompt = `Write a professional ATS-friendly cover letter for ${name} applying for ${job}.`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                { text: prompt }
-              ]
-            }
-          ]
+          inputs: prompt,
+          parameters: {
+            max_new_tokens: 300,
+            temperature: 0.7
+          }
         })
       }
     );
 
     const data = await response.json();
 
-    console.log("FULL GEMINI RESPONSE:", JSON.stringify(data, null, 2));
+    console.log("HF RESPONSE:", data);
 
-    // 🔥 SAFE EXTRACTION (FIX undefined issue)
-    const result =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      data?.error?.message ||
-      "No response text found";
+    let result = "";
+
+    if (Array.isArray(data)) {
+      result = data[0]?.generated_text;
+    } else {
+      result = data?.generated_text || data?.error || JSON.stringify(data);
+    }
 
     return res.status(200).json({
       result
