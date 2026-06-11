@@ -6,11 +6,7 @@ export default async function handler(req, res) {
 
     const { name, job } = req.body || {};
 
-    if (!name || !job) {
-      return res.status(400).json({ error: "Missing fields" });
-    }
-
-    const prompt = `Write a professional ATS-friendly cover letter for ${name} applying for ${job}.`;
+    const prompt = `Write a professional cover letter for ${name} applying for ${job}.`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -22,11 +18,8 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           contents: [
             {
-              role: "user",
               parts: [
-                {
-                  text: prompt
-                }
+                { text: prompt }
               ]
             }
           ]
@@ -36,25 +29,12 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    console.log("GEMINI RAW RESPONSE:", JSON.stringify(data, null, 2));
-
-    const result =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!result) {
-      return res.status(500).json({
-        error: "No content from Gemini",
-        debug: data
-      });
-    }
-
+    // 🔥 IMPORTANT: return FULL response for debugging
     return res.status(200).json({
-      result
+      raw: data
     });
 
   } catch (error) {
-    console.log(error);
-
     return res.status(500).json({
       error: error.message
     });
