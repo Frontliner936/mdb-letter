@@ -1,48 +1,24 @@
 export default async function handler(req, res) {
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ error: "Only POST allowed" });
-    }
-
     const { name, job } = req.body || {};
 
-    if (!name || !job) {
-      return res.status(400).json({ error: "Missing fields" });
-    }
+    const coverLetter = `
+Dear Hiring Manager,
 
-    const prompt = `Write a professional ATS-friendly cover letter for ${name} applying for ${job}.`;
+I am writing to express my interest in the ${job} position.
 
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            max_new_tokens: 300,
-            temperature: 0.7
-          }
-        })
-      }
-    );
+My name is ${name}, and I am eager to contribute my skills and experience to your organization.
 
-    const data = await response.json();
+I am a hardworking and dedicated professional who is ready to learn and grow within your company.
 
-    console.log("HF RESPONSE:", data);
+Thank you for considering my application.
 
-    let result = "";
-
-    if (Array.isArray(data)) {
-      result = data[0]?.generated_text;
-    } else {
-      result = data?.generated_text || data?.error || JSON.stringify(data);
-    }
+Sincerely,
+${name}
+`;
 
     return res.status(200).json({
-      result
+      result: coverLetter
     });
 
   } catch (error) {
