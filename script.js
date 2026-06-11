@@ -1,5 +1,9 @@
 window.generate = async function () {
-  document.getElementById("result").innerHTML = "Loading... 🔥";
+  const name = document.getElementById("name").value;
+  const job = document.getElementById("job").value;
+
+  const resultBox = document.getElementById("result");
+  resultBox.innerHTML = "Generating... 🔥";
 
   try {
     const res = await fetch("/api/generate", {
@@ -8,26 +12,21 @@ window.generate = async function () {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        name: document.getElementById("name").value,
-        job: document.getElementById("job").value
+        name,
+        job
       })
     });
 
-    const text = await res.text(); // IMPORTANT FIX
+    const data = await res.json();
 
-    let data;
-
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      throw new Error("Server returned invalid response: " + text);
+    if (!res.ok) {
+      resultBox.innerHTML = "Error: " + (data.error || "Request failed");
+      return;
     }
 
-    document.getElementById("result").innerHTML =
-      data.result || data.error;
+    resultBox.innerHTML = data.result;
 
   } catch (error) {
-    document.getElementById("result").innerHTML =
-      "Error: " + error.message;
+    resultBox.innerHTML = "Network Error: " + error.message;
   }
 };
