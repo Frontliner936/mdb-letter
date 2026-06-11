@@ -16,7 +16,7 @@ window.generate = async function () {
     const data = await res.json();
 
     document.getElementById("result").innerHTML =
-      data.result || data.error || "No response";
+      data.result || data.error;
 
   } catch (error) {
     document.getElementById("result").innerHTML =
