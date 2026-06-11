@@ -10,10 +10,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing fields" });
     }
 
-    const prompt = `
-Write a professional cover letter for ${name} applying for ${job}.
-Make it ATS friendly, formal, and around 300 words.
-`;
+    const prompt = `Write a professional ATS-friendly cover letter for ${name} applying for ${job}.`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -25,8 +22,11 @@ Make it ATS friendly, formal, and around 300 words.
         body: JSON.stringify({
           contents: [
             {
+              role: "user",
               parts: [
-                { text: prompt }
+                {
+                  text: prompt
+                }
               ]
             }
           ]
@@ -36,12 +36,14 @@ Make it ATS friendly, formal, and around 300 words.
 
     const data = await response.json();
 
+    console.log("GEMINI RAW RESPONSE:", JSON.stringify(data, null, 2));
+
     const result =
       data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!result) {
       return res.status(500).json({
-        error: "Gemini returned empty response",
+        error: "No content from Gemini",
         debug: data
       });
     }
@@ -51,6 +53,8 @@ Make it ATS friendly, formal, and around 300 words.
     });
 
   } catch (error) {
+    console.log(error);
+
     return res.status(500).json({
       error: error.message
     });
