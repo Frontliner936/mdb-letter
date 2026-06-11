@@ -1,25 +1,30 @@
-window.generate = async function () {
+window.generateCV = function () {
+
   const name = document.getElementById("name").value;
-  const job = document.getElementById("job").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("email").value;
+  const education = document.getElementById("education").value;
+  const experience = document.getElementById("experience").value;
+  const skills = document.getElementById("skills").value;
 
-  document.getElementById("result").innerHTML = "Generating... 🔥";
+  document.getElementById("cvResult").innerHTML = `
+  
+  <h2>${name}</h2>
 
-  try {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name, job })
-    });
+  <p><strong>Phone:</strong> ${phone}</p>
 
-    const data = await res.json();
+  <p><strong>Email:</strong> ${email}</p>
 
-    document.getElementById("result").innerHTML =
-      data.result || data.error;
+  <hr>
 
-  } catch (error) {
-    document.getElementById("result").innerHTML =
-      "Error: " + error.message;
-  }
-};
+  <h3>Education</h3>
+  <p>${education}</p>
+
+  <h3>Experience</h3>
+  <p>${experience}</p>
+
+  <h3>Skills</h3>
+  <p>${skills}</p>
+
+  `;
+}
